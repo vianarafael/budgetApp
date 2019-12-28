@@ -1,11 +1,32 @@
 // Data Controller
 const budgetController = (function() {
+    const data = {
+        allInc: [],
+        allExp: []
+    }
 
-
+  return {
+      storeInput: function(type, description, value) {
+        console.log(type, description, value)
+      }
+  }
 })()
 
 // UI Controller
 const UIController = (function() {
+
+    return {
+        getInput: function() {
+            let type = document.querySelector('.add__type').value
+            let description = document.querySelector('.add__description').value
+            let value = parseFloat(document.querySelector('.add__value').value)
+            return {
+                type,
+                description,
+                value
+            }
+        }
+    }
 
 })()
 
@@ -13,16 +34,20 @@ const UIController = (function() {
 const controller = (function(budgetCtrl, UICtrl) {
 
     const ctrlAddItem = function() {
+        let newInput
+
     // 1. Get the input data
+      newInput = UICtrl.getInput()
 
     // 2. add the item to the budget controller
-
+    budgetCtrl.storeInput(newInput.type, newInput.description, newInput.value)
+      
     // 3. add the item to the UI
 
     // 4. calculate the budget
 
     // 5 display the result of the calculation
-    console.log('?')
+ 
     }
 
     // When the add button is clicked ..
@@ -32,7 +57,7 @@ const controller = (function(budgetCtrl, UICtrl) {
     document.addEventListener('keypress', function(e) {
         // older browsers use which instead of keyCode
         if (e.keyCode === 13 || e.which === 13) {
-            ctrlAddItem
+            ctrlAddItem()
         }
     })
 

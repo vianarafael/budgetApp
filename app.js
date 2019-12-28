@@ -68,7 +68,6 @@ const UIController = (function() {
 
 // Global App Controller
 const controller = (function(budgetCtrl, UICtrl) {
-
     const setupEventListener = function() {
         // When the add button is clicked ..
         document.querySelector('.add__btn').addEventListener('click', ctrlAddItem)
@@ -84,19 +83,24 @@ const controller = (function(budgetCtrl, UICtrl) {
 
     const ctrlAddItem = function() {
         let newInput
+        // 1. Get the input data
+        newInput = UICtrl.getInput()
 
-    // 1. Get the input data
-      newInput = UICtrl.getInput()
+        if (!isNaN(newInput.value) && newInput.description.length > 0 && newInput.value > 0) {
 
-    // 2. add the item to the budget controller
-      budgetCtrl.storeInput(newInput)
-      
-    // 3. add the item to the UI
-       UICtrl.addListItem(newInput, newInput.type)
+            // 2. add the item to the budget controller
+            budgetCtrl.storeInput(newInput)
+        
+            // 3. add the item to the UI
+            UICtrl.addListItem(newInput, newInput.type)
 
-    // 4. calculate the budget
+            // 4. calculate the budget
 
-    // 5 display the result of the calculation
+            // 5 display the result of the calculation
+
+        }
+
+
  
     }
 

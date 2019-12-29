@@ -2,7 +2,12 @@
 const budgetController = (function() {
     const data = {
         allInc: [],
-        allExp: []
+        allExp: [],
+        total: {
+            inc: 0,
+            exp: 0
+        },
+        budget: 0
     }
 
     let ID = 0
@@ -17,7 +22,32 @@ const budgetController = (function() {
         } else if (obj.type === 'exp') {
             data.allExp.push(obj)
         }
-      }, 
+
+      },
+      sumUpInc: function() {
+        let result = 0
+        data.allInc.forEach(transaction => result += transaction.value)
+        data.total.inc = result
+      },
+
+      sumUpExp: function() {
+          let result = 0
+          data.allExp.forEach(transaction => result += transaction.value)
+          data.total.exp = result
+      },
+
+      calcBudget: function() {
+        data.budget = data.total.inc - data.total.exp
+      },
+
+      outputBudget: function() {
+        return {
+            'budget': data.budget,
+            'inc': data.total.inc,
+            'exp': data.total.exp
+        }
+      },
+
       testing: function() {
           return data
       }
@@ -34,14 +64,26 @@ const UIController = (function() {
             let description = document.querySelector('.add__description').value
             let value = parseFloat(document.querySelector('.add__value').value)
 
+            // Empty the input section 
             document.querySelector('.add__description').value = ''
             document.querySelector('.add__value').value = ''
+
+
 
             return {
                 type,
                 description,
-                value
-            }
+                value,
+                }
+
+            },
+
+            updateBudget: function(totalBudget, totalInc, totalExp) {
+                document.querySelector('.budget__value').textContent = totalBudget
+                document.querySelector('.budget__income').textContent = totalInc
+                document.querySelector('.budget__expenses').textContent = totalExp
+
+
         },
         addListItem(obj, type) {
 
@@ -82,7 +124,7 @@ const controller = (function(budgetCtrl, UICtrl) {
     }
 
     const ctrlAddItem = function() {
-        let newInput
+        let newInput, budgetObj
         // 1. Get the input data
         newInput = UICtrl.getInput()
 
@@ -95,8 +137,15 @@ const controller = (function(budgetCtrl, UICtrl) {
             UICtrl.addListItem(newInput, newInput.type)
 
             // 4. calculate the budget
+            budgetCtrl.sumUpInc()
+            budgetCtrl.sumUpExp()
+            budgetCtrl.calcBudget()
 
             // 5 display the result of the calculation
+            budgetObj = budgetCtrl.outputBudget()
+            UICtrl.updateBudget(budgetObj.budget, budgetObj.inc, budgetObj.exp)
+            
+
 
         }
 
@@ -107,7 +156,9 @@ const controller = (function(budgetCtrl, UICtrl) {
 
     return {
         init: function() {
+            UICtrl.updateBudget(0,0,0)
             setupEventListener()
+            
         }
     }
 

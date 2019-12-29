@@ -88,7 +88,7 @@ const UIController = (function() {
         addListItem(obj, type) {
 
             // Create HTML string with placeholder text
-              let html = '<div class="container" id="%id%"><div>%description%</div><div>%value%</div></div>'
+              let html = '<div class="container" id="%id%"><div class="container__description">%description%</div><div class="container__value">%value%</div></div>'
 
             // Replace the placeholder text with data
               let newHtml = html.replace('%description%', obj.description)     

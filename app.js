@@ -24,6 +24,22 @@ const budgetController = (function() {
         }
 
       },
+
+      removeItem: function(type, ID) {
+          let item, index
+          type = type[0].toUpperCase() + type.slice(1)
+
+
+             data['all' + type].map(i => {
+               if(i.id === ID) {
+                   item = data['all' + type][data['all' + type].indexOf(i)] 
+               }
+            })
+   
+        index = data['all' + type].indexOf(item)
+        data['all' + type].splice(index, 1)
+      },
+
       sumUpInc: function() {
         let result = 0
         data.allInc.forEach(transaction => result += transaction.value)
@@ -88,7 +104,7 @@ const UIController = (function() {
         addListItem(obj, type) {
 
             // Create HTML string with placeholder text
-              let html = '<div class="container" id="%id%"><div class="container__description">%description%</div><div class="container__value">%value%</div></div>'
+              let html = '<div class="container" id="%id%"><div class="container__description">%description%</div><div class="container__value">%value%</div><button class="remove__btn">remove</button></div>'
 
             // Replace the placeholder text with data
               let newHtml = html.replace('%description%', obj.description)     
@@ -99,10 +115,14 @@ const UIController = (function() {
             if (type === 'inc') {
                 document.querySelector('.income__list').insertAdjacentHTML('beforeend', newHtml)   
             } else if (type === 'exp') {
-                document.querySelector('.expenses').insertAdjacentHTML('beforeend', newHtml)  
+                document.querySelector('.expenses__list').insertAdjacentHTML('beforeend', newHtml)  
             }
 
 
+        },
+        deleteListItem: function(selectorID) {
+            let element = document.getElementById(selectorID)
+            element.parentNode.removeChild(element)
         }
     }
 
@@ -121,6 +141,21 @@ const controller = (function(budgetCtrl, UICtrl) {
                 ctrlAddItem()
             }
         })
+
+        document.querySelector('.transaction__container').addEventListener('click', ctrlDeleteItem)
+    }
+
+    function updateBudgetAndUI() {
+
+            // 1. calculate the budget
+            budgetCtrl.sumUpInc()
+            budgetCtrl.sumUpExp()
+            budgetCtrl.calcBudget()
+
+            // 2. display the result of the calculation
+            budgetObj = budgetCtrl.outputBudget()
+            UICtrl.updateBudget(budgetObj.budget, budgetObj.inc, budgetObj.exp)
+
     }
 
     const ctrlAddItem = function() {
@@ -136,21 +171,37 @@ const controller = (function(budgetCtrl, UICtrl) {
             // 3. add the item to the UI
             UICtrl.addListItem(newInput, newInput.type)
 
-            // 4. calculate the budget
-            budgetCtrl.sumUpInc()
-            budgetCtrl.sumUpExp()
-            budgetCtrl.calcBudget()
+            updateBudgetAndUI()
 
-            // 5 display the result of the calculation
-            budgetObj = budgetCtrl.outputBudget()
-            UICtrl.updateBudget(budgetObj.budget, budgetObj.inc, budgetObj.exp)
-            
+        }
+    }
 
+    const ctrlDeleteItem = function(e) {
+        let itemID, type
+        // 1. Get the item to be deleted
+        itemID = e.target.parentNode.id
+
+
+        if(itemID) {
+            if (e.target.parentNode.parentNode.classList.contains('income__list')){
+                type = 'inc'
+            }
+            if (e.target.parentNode.parentNode.classList.contains('expenses__list')){
+                type = 'exp'
+            }
+
+            itemID = parseInt(itemID)
+        // 2. Notify the budget controller and do the necessary calculations
+            budgetCtrl.removeItem(type, itemID)
+
+            updateBudgetAndUI()
+
+        // 3. Remove element from UI
+        UICtrl.deleteListItem(itemID)
 
         }
 
 
- 
     }
 
 
